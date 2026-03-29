@@ -8,6 +8,7 @@ export default function HomePage() {
     phone: "",
     email: "",
     investmentAmount: "",
+    investorType: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,6 +154,41 @@ export default function HomePage() {
                 />
               </div>
 
+              <div>
+                <label className="mb-3 block text-sm font-medium text-gray-200">
+                  نوع المستثمر
+                </label>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {[
+                    { label: "مستثمر جديد", value: "new" },
+                    { label: "مستثمر سابق", value: "existing" },
+                  ].map((item) => (
+                    <label
+                      key={item.value}
+                      className={`cursor-pointer rounded-2xl border p-4 text-center transition ${
+                        formData.investorType === item.value
+                          ? "border-[#837F44] bg-[#837F44]/10"
+                          : "border-[#2a2a2a] bg-black"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="investorType"
+                        value={item.value}
+                        checked={formData.investorType === item.value}
+                        onChange={handleChange}
+                        className="hidden"
+                        required
+                      />
+                      <span className="text-sm font-medium text-gray-300">
+                        {item.label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <button
                 type="submit"
                 className="w-full rounded-2xl bg-[#837F44] px-5 py-3 text-base font-semibold text-white transition hover:opacity-90"
@@ -171,7 +207,7 @@ export default function HomePage() {
 
       <section id="features" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <span className="rounded-full bg-[#111111] px-4 py-2 text-sm font-medium text-[#d4ce8a] border border-[#837F44]/20">
+          <span className="rounded-full border border-[#837F44]/20 bg-[#111111] px-4 py-2 text-sm font-medium text-[#d4ce8a]">
             لماذا نحن
           </span>
           <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
