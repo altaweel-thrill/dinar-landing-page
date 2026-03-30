@@ -30,8 +30,12 @@ export default function HomePage() {
         <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-[#837F44]/20 blur-3xl" />
         <div className="absolute top-20 right-0 h-72 w-72 rounded-full bg-[#837F44]/10 blur-3xl" />
 
+  
+
         <div className="relative mx-auto grid min-h-screen max-w-7xl items-center gap-12 px-6 py-12 lg:grid-cols-2 lg:px-8">
-          <div className="max-w-2xl">
+          
+          <div className="max-w-2xl gap-4" >
+             <img  className="p-4" width= "100"src="/logo.png" alt="Logo" />
             <span className="inline-flex items-center rounded-full border border-[#837F44]/40 bg-[#111111] px-4 py-2 text-sm font-medium text-[#d4ce8a] shadow-sm">
               فرص استثمارية مدروسة وفاخرة
             </span>
