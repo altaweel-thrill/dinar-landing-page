@@ -1,26 +1,65 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+
+const initialFormData = {
+  fullName: "",
+  phone: "",
+  email: "",
+  investmentAmount: "",
+  investorType: "",
+};
 
 export default function HomePage() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
-    email: "",
-    investmentAmount: "",
-    investorType: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSubmitMessage(null);
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      await addDoc(collection(db, "investmentLeads"), {
+        fullName: formData.fullName.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        investmentAmount: formData.investmentAmount.trim(),
+        investorType: formData.investorType,
+        source: "dinar-landing-page",
+        createdAt: serverTimestamp(),
+      });
+
+      setFormData(initialFormData);
+      setSubmitMessage({
+        type: "success",
+        text: "تم إرسال طلبك بنجاح. سيتواصل معك فريقنا قريبًا.",
+      });
+    } catch (error) {
+      console.error("Failed to submit lead", error);
+      setSubmitMessage({
+        type: "error",
+        text: "تعذر إرسال الطلب حاليًا. يرجى المحاولة مرة أخرى.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -35,7 +74,14 @@ export default function HomePage() {
         <div className="relative mx-auto grid min-h-screen max-w-7xl items-center gap-12 px-6 py-12 lg:grid-cols-2 lg:px-8">
           
           <div className="max-w-2xl gap-4" >
-             <img  className="p-4" width= "100"src="/logo.png" alt="Logo" />
+            <Image
+              className="p-4"
+              src="/logo.png"
+              alt="Logo"
+              width={100}
+              height={100}
+              priority
+            />
             <span className="inline-flex items-center rounded-full border border-[#837F44]/40 bg-[#111111] px-4 py-2 text-sm font-medium text-[#d4ce8a] shadow-sm">
               فرص استثمارية مدروسة وفاخرة
             </span>
@@ -110,6 +156,7 @@ export default function HomePage() {
                   value={formData.fullName}
                   onChange={handleChange}
                   placeholder="اكتب الاسم الكامل"
+                  disabled={isSubmitting}
                   className="w-full rounded-2xl border border-[#2a2a2a] bg-black px-4 py-3 text-white placeholder:text-gray-500 outline-none transition focus:border-[#837F44]"
                   required
                 />
@@ -125,6 +172,7 @@ export default function HomePage() {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="05xxxxxxxx"
+                  disabled={isSubmitting}
                   className="w-full rounded-2xl border border-[#2a2a2a] bg-black px-4 py-3 text-white placeholder:text-gray-500 outline-none transition focus:border-[#837F44]"
                   required
                 />
@@ -140,6 +188,7 @@ export default function HomePage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="name@email.com"
+                  disabled={isSubmitting}
                   className="w-full rounded-2xl border border-[#2a2a2a] bg-black px-4 py-3 text-white placeholder:text-gray-500 outline-none transition focus:border-[#837F44]"
                 />
               </div>
@@ -154,6 +203,7 @@ export default function HomePage() {
                   value={formData.investmentAmount}
                   onChange={handleChange}
                   placeholder="مثال: 50,000 ريال"
+                  disabled={isSubmitting}
                   className="w-full rounded-2xl border border-[#2a2a2a] bg-black px-4 py-3 text-white placeholder:text-gray-500 outline-none transition focus:border-[#837F44]"
                 />
               </div>
@@ -182,6 +232,7 @@ export default function HomePage() {
                         value={item.value}
                         checked={formData.investorType === item.value}
                         onChange={handleChange}
+                        disabled={isSubmitting}
                         className="hidden"
                         required
                       />
@@ -195,10 +246,24 @@ export default function HomePage() {
 
               <button
                 type="submit"
-                className="w-full rounded-2xl bg-[#837F44] px-5 py-3 text-base font-semibold text-white transition hover:opacity-90"
+                disabled={isSubmitting}
+                className="w-full rounded-2xl bg-[#837F44] px-5 py-3 text-base font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                إرسال الطلب
+                {isSubmitting ? "جاري الإرسال..." : "إرسال الطلب"}
               </button>
+
+              {submitMessage ? (
+                <p
+                  className={`rounded-2xl border px-4 py-3 text-center text-sm leading-6 ${
+                    submitMessage.type === "success"
+                      ? "border-green-500/30 bg-green-500/10 text-green-200"
+                      : "border-red-500/30 bg-red-500/10 text-red-200"
+                  }`}
+                  role="status"
+                >
+                  {submitMessage.text}
+                </p>
+              ) : null}
 
               <p className="text-center text-xs leading-5 text-gray-500">
                 بإرسال هذا النموذج فأنت توافق على أن يتم التواصل معك بخصوص

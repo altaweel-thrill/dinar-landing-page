@@ -1,0 +1,56 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidInvestmentLead() {
+      return request.resource.data.keys().hasOnly([
+          'fullName',
+          'phone',
+          'email',
+          'investmentAmount',
+          'investorType',
+          'source',
+          'createdAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'fullName',
+          'phone',
+          'email',
+          'investmentAmount',
+          'investorType',
+          'source',
+          'createdAt'
+        ])
+        && request.resource.data.fullName is string
+        && request.resource.data.fullName.size() >= 2
+        && request.resource.data.fullName.size() <= 120
+        && request.resource.data.phone is string
+        && request.resource.data.phone.matches('^[0-9+ -]{8,20}$')
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 120
+        && (
+          request.resource.data.email == ''
+          || request.resource.data.email.matches('^[^@ ]+@[^@ ]+[.][^@ ]+$')
+        )
+        && request.resource.data.investmentAmount is string
+        && request.resource.data.investmentAmount.size() <= 80
+        && request.resource.data.investorType in ['new', 'existing']
+        && request.resource.data.source == 'dinar-landing-page'
+        && request.resource.data.createdAt == request.time;
+    }
+
+    match /investmentLeads/{leadId} {
+      allow create: if isValidInvestmentLead();
+      allow read: if isSignedIn();
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
