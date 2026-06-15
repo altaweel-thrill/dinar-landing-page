@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { Handshake, ShieldCheck, TrendingUp } from "lucide-react";
 import { db } from "@/lib/firebase";
 
 const initialFormData = {
@@ -290,8 +291,8 @@ export default function HomePage() {
 
         <div className="grid gap-6 md:grid-cols-3">
           <div className="rounded-3xl border border-[#837F44]/20 bg-[#111111] p-6 shadow-sm">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#837F44]/15 text-xl text-[#d4ce8a]">
-              📈
+            <div className="mb-5 flex h-14 w-14 items-center justify-center border border-[#837F44]/45 bg-black text-[#d4ce8a] shadow-[inset_0_0_0_1px_rgba(131,127,68,0.08),0_8px_24px_rgba(0,0,0,0.24)] [clip-path:polygon(0_10px,10px_0,100%_0,100%_calc(100%_-_10px),calc(100%_-_10px)_100%,0_100%)]">
+              <TrendingUp aria-hidden="true" size={26} strokeWidth={1.8} />
             </div>
             <h3 className="text-xl font-bold text-white">فرص استثمارية متنوعة</h3>
             <p className="mt-3 text-sm leading-7 text-gray-400">
@@ -301,8 +302,8 @@ export default function HomePage() {
           </div>
 
           <div className="rounded-3xl border border-[#837F44]/20 bg-[#111111] p-6 shadow-sm">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#837F44]/15 text-xl text-[#d4ce8a]">
-              🤝
+            <div className="mb-5 flex h-14 w-14 items-center justify-center border border-[#837F44]/45 bg-black text-[#d4ce8a] shadow-[inset_0_0_0_1px_rgba(131,127,68,0.08),0_8px_24px_rgba(0,0,0,0.24)] [clip-path:polygon(0_10px,10px_0,100%_0,100%_calc(100%_-_10px),calc(100%_-_10px)_100%,0_100%)]">
+              <Handshake aria-hidden="true" size={26} strokeWidth={1.8} />
             </div>
             <h3 className="text-xl font-bold text-white">
               تواصل مباشر مع فريق مختص
@@ -314,8 +315,8 @@ export default function HomePage() {
           </div>
 
           <div className="rounded-3xl border border-[#837F44]/20 bg-[#111111] p-6 shadow-sm">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#837F44]/15 text-xl text-[#d4ce8a]">
-              🔒
+            <div className="mb-5 flex h-14 w-14 items-center justify-center border border-[#837F44]/45 bg-black text-[#d4ce8a] shadow-[inset_0_0_0_1px_rgba(131,127,68,0.08),0_8px_24px_rgba(0,0,0,0.24)] [clip-path:polygon(0_10px,10px_0,100%_0,100%_calc(100%_-_10px),calc(100%_-_10px)_100%,0_100%)]">
+              <ShieldCheck aria-hidden="true" size={26} strokeWidth={1.8} />
             </div>
             <h3 className="text-xl font-bold text-white">خصوصية وأمان للبيانات</h3>
             <p className="mt-3 text-sm leading-7 text-gray-400">
