@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { Handshake, ShieldCheck, TrendingUp } from "lucide-react";
-import { db } from "@/lib/firebase";
+import { getFirebaseDb } from "@/lib/firebase";
 
 const initialFormData = {
   fullName: "",
@@ -37,7 +37,7 @@ export default function HomePage() {
     setSubmitMessage(null);
 
     try {
-      await addDoc(collection(db, "investmentLeads"), {
+      await addDoc(collection(getFirebaseDb(), "investmentLeads"), {
         fullName: formData.fullName.trim(),
         phone: formData.phone.trim(),
         email: formData.email.trim(),

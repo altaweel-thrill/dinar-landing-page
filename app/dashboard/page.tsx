@@ -6,6 +6,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  type Auth,
   type User,
 } from "firebase/auth";
 import {
@@ -15,7 +16,7 @@ import {
   query,
   type Timestamp,
 } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase";
 
 type Lead = {
   id: string;
@@ -50,18 +51,30 @@ export default function DashboardPage() {
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [firebaseAuth, setFirebaseAuth] = useState<Auth | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [leadsError, setLeadsError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setAuthLoading(false);
-    });
+    try {
+      const nextAuth = getFirebaseAuth();
+      setFirebaseAuth(nextAuth);
 
-    return unsubscribe;
+      const unsubscribe = onAuthStateChanged(nextAuth, (currentUser) => {
+        setUser(currentUser);
+        setAuthLoading(false);
+      });
+
+      return unsubscribe;
+    } catch (error) {
+      console.error("Failed to initialize Firebase Auth", error);
+      setLoginError(
+        "إعدادات Firebase غير مكتملة. تأكد من إضافة متغيرات البيئة في منصة النشر.",
+      );
+      setAuthLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -74,7 +87,7 @@ export default function DashboardPage() {
     setLeadsError("");
 
     const leadsQuery = query(
-      collection(db, "investmentLeads"),
+      collection(getFirebaseDb(), "investmentLeads"),
       orderBy("createdAt", "desc"),
     );
 
@@ -142,7 +155,9 @@ export default function DashboardPage() {
     setLoginError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      const nextAuth = firebaseAuth ?? getFirebaseAuth();
+      setFirebaseAuth(nextAuth);
+      await signInWithEmailAndPassword(nextAuth, email.trim(), password);
       setPassword("");
     } catch (error) {
       console.error("Failed to sign in", error);
@@ -247,7 +262,11 @@ export default function DashboardPage() {
 
           <button
             type="button"
-            onClick={() => signOut(auth)}
+            onClick={() => {
+              if (firebaseAuth) {
+                signOut(firebaseAuth);
+              }
+            }}
             className="w-full rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-[#837F44] hover:text-white md:w-auto"
           >
             تسجيل الخروج

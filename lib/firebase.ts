@@ -1,6 +1,6 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,7 +11,45 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+let firebaseApp: FirebaseApp | null = null;
+let firebaseAuth: Auth | null = null;
+let firebaseDb: Firestore | null = null;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+function assertFirebaseConfig() {
+  const missingKeys = Object.entries(firebaseConfig)
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+
+  if (missingKeys.length > 0) {
+    throw new Error(
+      `Missing Firebase environment variables: ${missingKeys.join(", ")}`,
+    );
+  }
+}
+
+function getFirebaseApp() {
+  assertFirebaseConfig();
+
+  if (firebaseApp) {
+    return firebaseApp;
+  }
+
+  firebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  return firebaseApp;
+}
+
+export function getFirebaseAuth() {
+  if (!firebaseAuth) {
+    firebaseAuth = getAuth(getFirebaseApp());
+  }
+
+  return firebaseAuth;
+}
+
+export function getFirebaseDb() {
+  if (!firebaseDb) {
+    firebaseDb = getFirestore(getFirebaseApp());
+  }
+
+  return firebaseDb;
+}
